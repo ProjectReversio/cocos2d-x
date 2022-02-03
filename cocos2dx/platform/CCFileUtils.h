@@ -155,7 +155,7 @@ public:
 
      @since v2.1
      */
-    virtual std::string fullPathForFilename(const char* pszFileName);
+    virtual std::string fullPathForFilename(const char* pszFileName, bool lowQuality = false);
     
     /**
      * Loads the filenameLookup dictionary from the contents of a filename.

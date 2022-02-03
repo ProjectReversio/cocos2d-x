@@ -594,7 +594,7 @@ std::string CCFileUtils::getPathForFilename(const std::string& filename, const s
 }
 
 
-std::string CCFileUtils::fullPathForFilename(const char* pszFileName)
+std::string CCFileUtils::fullPathForFilename(const char* pszFileName, bool lowQuality)
 {
     CCAssert(pszFileName != NULL, "CCFileUtils: Invalid path");
     
@@ -617,6 +617,53 @@ std::string CCFileUtils::fullPathForFilename(const char* pszFileName)
     std::string newFilename = getNewFilename(pszFileName);
     
     string fullpath = "";
+
+    CCDirector* pDirector = CCDirector::sharedDirector();
+
+    float scale = pDirector->getContentScaleFactor();
+    int scaleAmount = lowQuality;
+    if (scale < 4.0f || scaleAmount != 0)
+    {
+        scaleAmount = 2;
+        if (scale >= 2.0f)
+            scaleAmount = ((static_cast<unsigned>(lowQuality) | 0x200000000uLL) - 1) >> 32;
+    }
+
+    // TODO: This code is very messy, improve it later
+
+    std::string fileExt = "";
+    std::string fileNameNoExt = "";
+
+    int lastIndex = newFilename.find_last_of(".");
+    if (lastIndex < 0)
+    {
+        fileNameNoExt = newFilename;
+        fileExt = "";
+    }
+    else
+    {
+        fileNameNoExt = newFilename.substr(0, lastIndex);
+        fileExt = newFilename.substr(lastIndex);
+    }
+
+    std::string newFilenameHD = fileNameNoExt;
+    std::string newFilenameUHD = fileNameNoExt;
+
+    if (scaleAmount > 1) // LQ
+    {
+        newFilenameHD += fileExt;
+        newFilenameUHD += fileExt;
+    }
+    else if (scaleAmount == 1) // HD
+    {
+        newFilenameHD += std::string("-hd") + fileExt;
+        newFilenameUHD += std::string("-hd") + fileExt;
+    }
+    else // UHD
+    {
+        newFilenameHD += std::string("-hd") + fileExt;
+        newFilenameUHD += std::string("-uhd") + fileExt;
+    }
     
     for (std::vector<std::string>::iterator searchPathsIter = m_searchPathArray.begin();
          searchPathsIter != m_searchPathArray.end(); ++searchPathsIter) {
@@ -625,8 +672,14 @@ std::string CCFileUtils::fullPathForFilename(const char* pszFileName)
             
             //CCLOG("\n\nSEARCHING: %s, %s, %s", newFilename.c_str(), resOrderIter->c_str(), searchPathsIter->c_str());
             
-            fullpath = this->getPathForFilename(newFilename, *resOrderIter, *searchPathsIter);
-            
+            fullpath = this->getPathForFilename(newFilenameUHD, *resOrderIter, *searchPathsIter);
+
+            if (fullpath.length() == 0)
+                fullpath = this->getPathForFilename(newFilenameHD, *resOrderIter, *searchPathsIter);
+                
+            if (fullpath.length() == 0)
+                fullpath = this->getPathForFilename(newFilename, *resOrderIter, *searchPathsIter);
+
             if (fullpath.length() > 0)
             {
                 // Using the filename passed in as key.

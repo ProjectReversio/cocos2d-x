@@ -391,7 +391,7 @@ void CCTextureCache::addImageAsyncCallBack(float dt)
     }
 }
 
-CCTexture2D * CCTextureCache::addImage(const char * path)
+CCTexture2D * CCTextureCache::addImage(const char * path, bool lowQuality)
 {
     CCAssert(path != NULL, "TextureCache: fileimage MUST not be NULL");
 
@@ -405,7 +405,7 @@ CCTexture2D * CCTextureCache::addImage(const char * path)
 
     std::string pathKey = path;
 
-    pathKey = CCFileUtils::sharedFileUtils()->fullPathForFilename(pathKey.c_str());
+    pathKey = CCFileUtils::sharedFileUtils()->fullPathForFilename(pathKey.c_str(), lowQuality);
     if (pathKey.size() == 0)
     {
         return NULL;

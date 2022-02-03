@@ -62,6 +62,13 @@ typedef enum {
     kCCDirectorProjectionDefault = kCCDirectorProjection3D,
 } ccDirectorProjection;
 
+typedef enum
+{
+    LowQuality = 1,
+    MediumQuality = 2,
+    HighQuality = 3,
+} TextureQuality;
+
 /* Forward declarations. */
 class CCLabelAtlas;
 class CCScene;
@@ -317,6 +324,10 @@ public:
 
     virtual void mainLoop(void) = 0;
 
+    void setupScreenScale(CCSize contentSize, CCSize screenSize, TextureQuality quality);
+    void updateScreenScale(CCSize screenSize);
+    void updateContentScale(TextureQuality quality);
+
     /** The size in pixels of the surface. It could be different than the screen size.
     High-res devices might have a higher surface size than the screen size.
     Only available when compiled using SDK >= 4.0.
@@ -324,6 +335,15 @@ public:
     */
     void setContentScaleFactor(float scaleFactor);
     float getContentScaleFactor(void);
+
+    float getScreenScaleFactor();
+    float getScreenScaleFactorMax();
+    float getScreenScaleFactorH();
+    float getScreenScaleFactorW();
+    float getScreenTop();
+    float getScreenBottom();
+    float getScreenLeft();
+    float getScreenRight();
 
 public:
     /** CCScheduler associated with this director
@@ -429,6 +449,18 @@ protected:
     
     /* content scale factor */
     float    m_fContentScaleFactor;
+
+    CCSize m_contentSize;
+    CCSize m_screenSize;
+    float m_fScreenTop;
+    float m_fScreenBottom;
+    float m_fScreenLeft;
+    float m_fScreenRight;
+    float m_fScreenScaleFactor;
+    float m_fScreenScaleFactorMax;
+    float m_fScreenScaleFactorH;
+    float m_fScreenScaleFactorW;
+    TextureQuality m_textureQuality;
 
     /* store the fps string */
     char *m_pszFPS;
