@@ -151,8 +151,12 @@ void CCTouchDispatcher::addStandardDelegate(CCTouchDelegate *pDelegate, int nPri
 }
 
 void CCTouchDispatcher::addTargetedDelegate(CCTouchDelegate *pDelegate, int nPriority, bool bSwallowsTouches)
-{    
-    CCTouchHandler *pHandler = CCTargetedTouchHandler::handlerWithDelegate(pDelegate, nPriority, bSwallowsTouches);
+{
+    int priority = nPriority;
+    if (mShouldForcePriority && priority > mForcePriority)
+        priority = mForcePriority;
+
+    CCTouchHandler *pHandler = CCTargetedTouchHandler::handlerWithDelegate(pDelegate, priority, bSwallowsTouches);
     if (! m_bLocked)
     {
         forceAddHandler(pHandler, m_pTargetedHandlers);
@@ -311,6 +315,19 @@ void CCTouchDispatcher::setPriority(int nPriority, CCTouchDelegate *pDelegate)
         this->rearrangeHandlers(m_pTargetedHandlers);
         this->rearrangeHandlers(m_pStandardHandlers);
     }
+}
+
+void CCTouchDispatcher::incrementForcePrio(int forcePriority)
+{
+    mShouldForcePriority = true;
+    mForcePriority -= 2;
+}
+
+void CCTouchDispatcher::decrementForcePrio(int forcePriority)
+{
+    if (mShouldForcePriority)
+        mForcePriority += 2;
+    mShouldForcePriority = false;
 }
 
 //

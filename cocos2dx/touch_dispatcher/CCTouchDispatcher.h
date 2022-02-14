@@ -170,6 +170,10 @@ public:
      * @lua NA
      */
     void setPriority(int nPriority, CCTouchDelegate *pDelegate);
+
+    void setForcePrio(int forcePriority) { mForcePriority = forcePriority; }
+    void incrementForcePrio(int forcePriority);
+    void decrementForcePrio(int forcePriority);
     /**
      * @lua NA
      */
@@ -214,6 +218,8 @@ protected:
     struct _ccCArray *m_pHandlersToRemove;
     bool m_bToQuit;
     bool m_bDispatchEvents;
+    bool mShouldForcePriority;
+    int mForcePriority;
 
     // 4, 1 for each type of event
     struct ccTouchHandlerHelperData m_sHandlerHelperData[ccTouchMax];
